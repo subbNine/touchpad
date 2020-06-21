@@ -1,0 +1,15 @@
+touchpadserver/.idea
+touchpadserver/exec.bat
+touchpadserver/main.py.bak
+touchpadserver/touchpadserver.nja
+
+touchpadclient/exec.bat
+touchpadclient/main-copy.py
+touchpadclient/main.pyc
+touchpadclient/touchevent.txt
+touchpadclient/.vscode/
+touchpadclient/.idea/
+touchpadclient/images/Thumbs.db
+touchpadclient/images/backgrounds/Thumbs.db
+touchpadclient/network/__pycache__
+touchpadclient/screens/__pycache__

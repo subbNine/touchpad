@@ -1,0 +1,306 @@
+#:import MDBottomNavigation kivymd.tabs.MDBottomNavigation
+#:import MDBottomNavigationItem kivymd.tabs.MDBottomNavigationItem
+#:import MDTextField kivymd.textfields.MDTextField
+#:import Window kivy.core.window.Window
+#:import MDThemePicker kivymd.theme_picker.MDThemePicker
+#:import MDRaisedButton kivymd.button.MDRaisedButton
+#:import MDDropdownMenu kivymd.menu.MDDropdownMenu
+#:import Toolbar kivymd.toolbar.Toolbar
+#:import ActionButton kivymd.button.MDFloatingActionButton
+#:import hexcolor kivy.utils.get_color_from_hex
+#:import Clock kivy.clock.Clock
+#:import Transition kivy.uix.screenmanager.NoTransition
+#:import MDLabel kivymd.label.MDLabel
+
+<HiddenMenuBtn@MDIconButton>:
+    icon: 'dots-vertical'
+    
+    
+
+<MainAppContainer>:
+    size_hint_y: None
+    height: Window.height
+    FloatLayout:
+        size_hint_y: None
+        height: Window.height
+        id: icons_container
+        ScManager:
+            id: sc_mgr
+            ConnInitScreen:
+                id: init_connection_screen
+            PcCltTransScreen:
+                id: pc_client_transfer
+            MainScreen:
+                id: main_screen
+            TouchPadScreen:
+                id: touchpad_screen
+            ImageViewScreen:
+                id: imageview_screen
+            KeyboardScreen:
+                id: keyboard_screen
+        ScrollView:
+            size_hint:None, None
+            width: dp(50)
+            pos_hint: {'right': 1+self.width/Window.width}
+            height: Window.height
+            scroll_y: 0
+            id: ct_sv
+            FloatLayout:
+                size_hint_y: None
+                height: Window.height+dp(40)
+                id: floating_icons_container
+
+
+
+
+<ImageViewScreen>:
+    name: 'imageview_screen'
+
+
+<KeyboardScreen>:
+    name: 'keyboard_screen'
+    canvas.before:
+        Color:
+            rgba: hexcolor('#505050')
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    TextInput:
+        size_hint: 0.97, None
+        height: 0.3 * Window.height  if self.focus else Window.height-dp(100) #-dp(100)
+        pos_hint: {'center_x': 0.5, 'top':0.97}
+        foreground_color: 0,0,0,1
+        cursor_color: 0,0,0,1
+        font_size: sp(14)
+        background_color: (1,1,1,0.7)
+
+<ConnInitScreen>:
+    canvas.before:
+        Rectangle:
+            size: (Window.width, (app.bg_image.texture_size[0]/app.bg_image.texture_size[1]) * Window.width) if Window.width > Window.height else ((app.bg_image.texture_size[0]/app.bg_image.texture_size[1]) * Window.height, Window.height) #app.bg_image.texture_size[0], app.bg_image.texture_size[1] # self.size
+            pos: (0, -((app.bg_image.texture_size[0]/app.bg_image.texture_size[1]) * Window.width)  +Window.height+((app.bg_image.texture_size[0]/app.bg_image.texture_size[1]) * Window.width)/4) if Window.width > Window.height else (0, 0)
+            texture: app.bg_image.texture
+        Color:
+            rgba: 1, 1, 1, 0.5
+        Rectangle:
+            size: Window.size#self.size
+            pos: 0,0#self.pos
+
+    name: 'init_connection_screen'
+    on_pre_leave:
+        Clock.schedule_once(app.show_menu_btn, 0.5)
+        # app.show_menu_btn(5)
+    on_pre_enter:
+        app.hide_menu_btn()
+    Toolbar:
+        title: 'TouchPAD'
+        pos_hint:{'top':1}
+        md_bg_color: hexcolor('#222222')
+        height: dp(40)
+        right_action_items: [['dots-vertical', lambda x: MDDropdownMenu(items=app.menu_items, width_mult=4).open(self)]]
+    FloatLayout:
+        #orientation: 'vertical'
+        # cols: 1
+        #size_hint_y: None
+        #height: self.minimum_height
+        pos_hint: {'center_x':0.5, 'center_y': 0.5}
+        spacing: dp(10)
+        # TextInput:
+        #    id: ip_address_field
+        #    size_hint: 0.5, None
+        #    pos_hint: {'center_x': 0.5, 'center_y': 0.6}
+        #    height: dp(35)
+        #    font_size: dp(18)
+        #    hint_text: 'IP Address'
+        #    multiline: False
+        #    cursor_color: app.theme_cls.primary_color
+        
+        HiddenMenuBtn:
+            right: root.right-dp(12)
+            top: root.top+dp(4)
+            opposite_colors: True
+            on_release:
+                MDDropdownMenu(items=app.menu_items, width_mult=2).open(self)
+
+        MDIconButton:
+            icon: 'play'
+            id: connect_btn
+            pos_hint: {'center_x': 0.5, 'center_y': 0.55}
+            color: app.theme_cls.primary_color
+            # top: ip_address_field.y-dp(3)
+            # x: ip_address_field.x
+            # text: 'Connect'
+            text_color: 0,0,1,1
+            on_release:
+                app.init_connection()
+                # root.manager.current = 'touchpad_screen'
+        MDLabel:
+            id: start_app
+            font_style: 'Body1'
+            theme_text_color: 'Primary'
+            text: "Start App"
+            size_hint_x:None
+            size_hint_y: None
+            # width: '56dp'
+            text_size: self.size
+            halign: 'center'
+            height: self.texture_size[1]
+            top: connect_btn.y-dp(5)
+            center_x: root.center_x
+        MDIconButton:
+            id: app_btn
+            icon: 'share-variant'
+            top: start_app.y-dp(5)
+            x: connect_btn.x
+            # text: 'Share App'
+            on_release:
+                app.change_screen('pc_client_transfer', Transition, 'right')
+        MDLabel:
+            id: share_app
+            font_style: 'Body1'
+            theme_text_color: 'Primary'
+            text: "Share"
+            size_hint_x: None
+            size_hint_y: None
+            #width: dp(34)
+            halign: 'center'
+            text_size: self.size
+            height: self.texture_size[1]
+            top: app_btn.y-dp(5)
+            center_x: app_btn.center_x
+
+
+<PcCltTransScreen>:
+    name: 'pc_client_transfer'
+    Toolbar:
+        title: 'Connect to PC'
+        pos_hint:{'top':1}
+        md_bg_color: hexcolor('#222222')
+        height: dp(40)
+        left_action_items: [['arrow-left', lambda x: app.change_screen('init_connection_screen', Transition, 'left')]]
+    BoxLayout:
+        orientation: 'vertical'
+        top: root.center_y+dp(40)
+        size_hint: 1, 1
+        spacing: dp(30)
+        #padding: dp(30)
+        MDLabel:
+            id: conn_help
+            size_hint: None, None
+            halign: 'center'
+            text_size: self.size
+            pos_hint: {'center_x': 0.5}
+            width: dp(300)
+            #height: dp(60)
+            text: "1. Start a mobile Hotspot and connect your PC to it. \n2. Click on the icon below to reveal an   address which you can enter into the address bar of your PC's web browser."
+        RelativeLayout:
+            id: address_box
+            canvas.before:
+                Rectangle:
+                    size: self.size
+                    pos: 0,0
+                Color:
+                    rgba: 0.1, 0.1, 0.1, 1
+            size_hint: None, None
+            width: dp(300)
+            height: dp(1)
+            pos_hint:{'center_x': 0.5}
+            
+            
+            MDIconButton:
+                icon: 'chevron-down'
+                id: connect_btn
+                pos_hint: {'center_x': 0.5, 'center_y': 0}
+                color: app.theme_cls.primary_color
+                # top: ip_address_field.y-dp(3)
+                # x: ip_address_field.x
+                # text: 'Connect'
+                text_color: 0,0,1,1
+                on_release:
+                    # app.init_connection()
+
+<TouchPad>:
+    orientation:
+    canvas.before:
+        Color:
+            rgba: 0,0,0,0
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<ScrollBar>:
+    canvas.before:
+        Color:
+            rgba: hexcolor('#A0B0A8')
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<TouchPadScreen>:
+    name: 'touchpad_screen'
+    on_enter:
+        Clock.create_trigger(lambda x :app.show_touchpad_ctrls(), 0.1)()
+        
+    on_pre_leave:
+        app.hide_touchpad_ctrls()
+    canvas.before:
+        Rectangle:
+            # size: app.touchpad_bg.texture_size #app.bg_image.texture_size[0], app.bg_image.texture_size[1] # self.size
+            size: Window.width, (app.touchpad_bg.texture_size[0]/app.touchpad_bg.texture_size[1]) * Window.width #app.bg_image.texture_size[0], app.bg_image.texture_size[1] # self.size
+            pos: 0,0
+            texture: app.touchpad_bg.texture
+        Color:
+            rgba: 0, 0, 0, 0.7
+        Rectangle:
+            size: Window.size#self.size
+            pos: 0,0#self.pos
+    BoxLayout:
+        orientation: 'horizontal'
+        spacing: 0
+        TouchPad:
+            id: touch_pad
+
+
+<GridButton>:
+    icon: 'view-grid'
+    opposite_colors:    False
+    # background_palette: 'Primary'
+    md_bg_color: app.theme_cls.primary_color
+    elevation_normal:    8
+    pos_hint:            {'x': 0.019, 'y': -self.height/Window.height}
+    # opacity: 0
+    # disabled: disable_the_buttons.active
+
+<ProgressView>:
+    size_hint_x: 0.5
+    size_hint_y :0.2
+    #width: 130
+    #background:''
+    background: 'atlas://images/backgrounds/backgrounds/modalview-white'
+    center_a: root.x+self.R+10
+    center_b: root.center_y
+    auto_dismiss: False
+    canvas.after:
+        Color:
+            rgba: app.theme_cls.primary_color # hex_color('#fe0000')
+        Line:
+            width: self.w
+            circle: self.center_a, self.center_b, self.R, self.stop_deg, self.start_deg
+    Label:
+        #canvas.before:
+        #    Color:
+        #        rgba: 0.7,0.7,0.7,1
+        #    Rectangle:
+        #        size: self.size
+        #        pos: self.pos
+        id: modalview_label
+        bold: True
+        center_x:root.center_x
+        text: root.modalview_text
+        color: 0, 0, 0, 1#255/255, 71/255, 109/255, 1
+        right: root.right
+        width: 50
+        #text_size:self.size
+        #halign: 'right'
+        #valign: 'center'
+
